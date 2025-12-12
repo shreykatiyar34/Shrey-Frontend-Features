@@ -1,0 +1,250 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 32px 20px;
+}
+
+.page__backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(150% 120% at 10% 20%, #11151a 0%, #040506 55%);
+  z-index: 0;
+}
+
+.page__content {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+}
+
+.auth-card {
+  background: #0f1215;
+  border-radius: 18px;
+  padding: 40px 36px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  color: #f5f6f7;
+}
+
+.auth-card__header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-card__title {
+  margin: 0 0 4px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.auth-card__title--accent {
+  color: #86ff00;
+}
+
+.auth-card__subtitle {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.auth-card__body {
+  width: 100%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.stack--md {
+  gap: 20px;
+}
+
+.stack--lg {
+  gap: 24px;
+}
+
+.tab-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  background: #0b0e11;
+  border-radius: 14px;
+  padding: 4px;
+  border: 1px solid #14181d;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.tab-switcher__tab {
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  font-weight: 600;
+  padding: 12px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-switcher__tab--active {
+  background: #86ff00;
+  color: #0c0c0c;
+  box-shadow: 0 10px 30px rgba(134, 255, 0, 0.28);
+}
+
+.tab-switcher__tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field__label {
+  color: #9fe800;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field__input {
+  background: #0c0f12;
+  border: 1px solid #161b20;
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #f5f6f7;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field__input::placeholder {
+  color: #6b7280;
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: #86ff00;
+  box-shadow: 0 0 0 3px rgba(134, 255, 0, 0.2);
+}
+
+.primary-button {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  background: #86ff00;
+  color: #0b0c0f;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 10px 30px rgba(134, 255, 0, 0.3);
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(134, 255, 0, 0.36);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.primary-button:disabled {
+  background: #56585c;
+  color: #d1d5db;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.otp__contact {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.otp-input {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  justify-items: center;
+}
+
+.otp-input__box {
+  width: 56px;
+  height: 64px;
+  border-radius: 10px;
+  border: 1px solid #151a1f;
+  background: #0a0c0f;
+  color: #f5f6f7;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.otp-input__box:focus {
+  outline: none;
+  border-color: #86ff00;
+  box-shadow: 0 0 0 3px rgba(134, 255, 0, 0.2);
+}
+
+.otp__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.otp__resend {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.otp__resend:hover:not(:disabled) {
+  color: #f5f6f7;
+}
+
+.otp__resend:disabled {
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.otp__timer {
+  color: #6b7280;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 540px) {
+  .auth-card {
+    padding: 32px 24px;
+  }
+
+  .auth-card__title {
+    font-size: 28px;
+  }
+
+  .otp-input {
+    gap: 8px;
+  }
+
+  .otp-input__box {
+    width: 48px;
+    height: 56px;
+    font-size: 20px;
+  }
+}
