@@ -35,14 +35,18 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "dist/"
-          target: "/var/www/"
-          strip_components: 0
+          source: "dist/*"
+          target: "~/deploy"
 
-      - name: Reload Nginx
+      - name: Deploy to web root
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: sudo systemctl reload nginx
+          script: |
+            sudo rm -rf /var/www/html/*
+            sudo cp -r ~/deploy/dist/* /var/www/html/
+            sudo chown -R www-data:www-data /var/www/html
+            sudo systemctl daemon-reload
+            sudo systemctl reload nginx
