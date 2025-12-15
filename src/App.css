@@ -136,6 +136,132 @@
   box-shadow: 0 0 0 3px rgba(134, 255, 0, 0.2);
 }
 
+.phone-field-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.country-selector {
+  position: relative;
+}
+
+.country-selector__button {
+  background: #0c0f12;
+  border: 1px solid #161b20;
+  border-radius: 10px;
+  padding: 14px 12px;
+  color: #f5f6f7;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+  height: 48px;
+}
+
+.country-selector__button:hover {
+  border-color: #2a2f35;
+}
+
+.country-selector__button:focus {
+  outline: none;
+  border-color: #86ff00;
+  box-shadow: 0 0 0 3px rgba(134, 255, 0, 0.2);
+}
+
+.country-selector__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.country-selector__button--loading {
+  background: #141820;
+  border-color: #1f2530;
+}
+
+.country-selector__button--error {
+  background: #2c1f1f;
+  border-color: #6b3838;
+  color: #ff6b6b;
+}
+
+.country-selector__flag {
+  font-size: 18px;
+}
+
+.country-selector__code {
+  font-weight: 600;
+  min-width: 35px;
+}
+
+.country-selector__arrow {
+  font-size: 10px;
+  color: #6b7280;
+  transition: transform 0.2s ease;
+}
+
+.country-selector__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background: #0c0f12;
+  border: 1px solid #161b20;
+  border-radius: 10px;
+  margin-top: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  min-width: 280px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+.country-selector__option {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.country-selector__option:hover {
+  background: #161b20;
+}
+
+.country-selector__option--active {
+  background: rgba(134, 255, 0, 0.15);
+  color: #86ff00;
+  font-weight: 600;
+}
+
+.country-selector__option-flag {
+  font-size: 18px;
+  min-width: 24px;
+}
+
+.country-selector__option-name {
+  flex: 1;
+}
+
+.country-selector__option-code {
+  color: #6b7280;
+  min-width: 50px;
+  text-align: right;
+}
+
+.country-selector__option--active .country-selector__option-code {
+  color: #86ff00;
+}
+
 .primary-button {
   width: 100%;
   border: none;
