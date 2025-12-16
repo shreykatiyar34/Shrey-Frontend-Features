@@ -5,6 +5,7 @@ import { TabSwitcher } from '../components/TabSwitcher';
 import { TextField } from '../components/TextField';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { OtpInput } from '../components/OtpInput';
+import { CountryCodeSelector } from '../components/CountryCodeSelector';
 import authService from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 
@@ -20,12 +21,13 @@ export function LoginPage() {
   const [step, setStep] = useState<Step>('login');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91'); // Default to India
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [timer, setTimer] = useState(20);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const identifier = mode === 'email' ? email : phone;
+  const identifier = mode === 'email' ? email : `${countryCode}${phone.replace(/\s+/g, '')}`;
 
   const isLoginDisabled = useMemo(() => {
     if (mode === 'email') return email.trim() === '';
@@ -49,7 +51,7 @@ export function LoginPage() {
     setLoading(true);
     setError('');
 
-    try {
+      try {
       await authService.sendOtp({
         identifier,
         provider: 'auto',
@@ -59,6 +61,7 @@ export function LoginPage() {
       setOtp(Array(OTP_LENGTH).fill(''));
     } catch (err: any) {
       console.error('Send OTP error:', err);
+      console.error('Error response:', err.response?.data);
       setError(err.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setLoading(false);
@@ -117,7 +120,7 @@ export function LoginPage() {
     }
   };
 
-  const contactValue = mode === 'phone' ? phone || '+91 9650873913' : email || 'example@email.com';
+  const contactValue = mode === 'phone' ? `${countryCode}${phone || '9650873913'}` : email || 'example@email.com';
 
   return (
     <div className="page">
@@ -143,13 +146,16 @@ export function LoginPage() {
                   type="email"
                 />
               ) : (
-                <TextField
-                  label="Enter your phone number *"
-                  placeholder="+91 9650873913"
-                  value={phone}
-                  onChange={setPhone}
-                  type="tel"
-                />
+                <div className="phone-field-wrapper">
+                  <CountryCodeSelector value={countryCode} onChange={setCountryCode} />
+                  <TextField
+                    label="Enter your phone number *"
+                    placeholder="9650873913"
+                    value={phone}
+                    onChange={setPhone}
+                    type="tel"
+                  />
+                </div>
               )}
               {error && <div className="error-message">{error}</div>}
               <PrimaryButton
@@ -194,4 +200,3 @@ export function LoginPage() {
     </div>
   );
 }
-
