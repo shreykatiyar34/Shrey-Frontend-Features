@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import COUNTRY_NAMES from '../data/countryNames';
 
 interface Country {
   name: string;
@@ -25,126 +26,9 @@ function getCountryFlag(countryCode: string): string {
   }
 }
 
-// Function to get country name from country code
+// Function to get country name from shared mapping
 function getCountryName(countryCode: string): string {
-  const countryNames: { [key: string]: string } = {
-    'US': 'United States',
-    'GB': 'United Kingdom',
-    'IN': 'India',
-    'CA': 'Canada',
-    'AU': 'Australia',
-    'DE': 'Germany',
-    'FR': 'France',
-    'JP': 'Japan',
-    'CN': 'China',
-    'BR': 'Brazil',
-    'MX': 'Mexico',
-    'SG': 'Singapore',
-    'AE': 'UAE',
-    'SA': 'Saudi Arabia',
-    'NZ': 'New Zealand',
-    'RU': 'Russia',
-    'IT': 'Italy',
-    'ES': 'Spain',
-    'NL': 'Netherlands',
-    'BE': 'Belgium',
-    'SE': 'Sweden',
-    'NO': 'Norway',
-    'DK': 'Denmark',
-    'FI': 'Finland',
-    'PL': 'Poland',
-    'ZA': 'South Africa',
-    'KR': 'South Korea',
-    'TH': 'Thailand',
-    'MY': 'Malaysia',
-    'ID': 'Indonesia',
-    'PH': 'Philippines',
-    'VN': 'Vietnam',
-    'PK': 'Pakistan',
-    'BD': 'Bangladesh',
-    'LK': 'Sri Lanka',
-    'NG': 'Nigeria',
-    'EG': 'Egypt',
-    'CH': 'Switzerland',
-    'AT': 'Austria',
-    'CZ': 'Czech Republic',
-    'GR': 'Greece',
-    'PT': 'Portugal',
-    'IE': 'Ireland',
-    'IL': 'Israel',
-    'TR': 'Turkey',
-    'IQ': 'Iraq',
-    'IR': 'Iran',
-    'JO': 'Jordan',
-    'LB': 'Lebanon',
-    'SY': 'Syria',
-    'YE': 'Yemen',
-    'OM': 'Oman',
-    'QA': 'Qatar',
-    'KW': 'Kuwait',
-    'BH': 'Bahrain',
-    'TN': 'Tunisia',
-    'DZ': 'Algeria',
-    'MA': 'Morocco',
-    'LY': 'Libya',
-    'SD': 'Sudan',
-    'ET': 'Ethiopia',
-    'KE': 'Kenya',
-    'UG': 'Uganda',
-    'TZ': 'Tanzania',
-    'MW': 'Malawi',
-    'ZM': 'Zambia',
-    'ZW': 'Zimbabwe',
-    'AR': 'Argentina',
-    'CL': 'Chile',
-    'CO': 'Colombia',
-    'PE': 'Peru',
-    'VE': 'Venezuela',
-    'EC': 'Ecuador',
-    'BO': 'Bolivia',
-    'PY': 'Paraguay',
-    'UY': 'Uruguay',
-    'KH': 'Cambodia',
-    'LA': 'Laos',
-    'MM': 'Myanmar',
-    'NP': 'Nepal',
-    'AF': 'Afghanistan',
-    'AZ': 'Azerbaijan',
-    'KZ': 'Kazakhstan',
-    'UZ': 'Uzbekistan',
-    'TJ': 'Tajikistan',
-    'TM': 'Turkmenistan',
-    'KG': 'Kyrgyzstan',
-    'MD': 'Moldova',
-    'UA': 'Ukraine',
-    'BY': 'Belarus',
-    'RS': 'Serbia',
-    'HR': 'Croatia',
-    'SI': 'Slovenia',
-    'CY': 'Cyprus',
-    'MT': 'Malta',
-    'LU': 'Luxembourg',
-    'IS': 'Iceland',
-    'AL': 'Albania',
-    'ME': 'Montenegro',
-    'MK': 'North Macedonia',
-    'BA': 'Bosnia and Herzegovina',
-    'HU': 'Hungary',
-    'SK': 'Slovakia',
-    'RO': 'Romania',
-    'BG': 'Bulgaria',
-    'LV': 'Latvia',
-    'LT': 'Lithuania',
-    'EE': 'Estonia',
-    'HK': 'Hong Kong',
-    'TW': 'Taiwan',
-    'MO': 'Macau',
-    'MN': 'Mongolia',
-    'BN': 'Brunei',
-    'FJ': 'Fiji',
-    'PG': 'Papua New Guinea',
-  };
-  return countryNames[countryCode] || countryCode;
+  return COUNTRY_NAMES[countryCode] || countryCode;
 }
 
 export function CountryCodeSelector({ value, onChange }: CountryCodeSelectorProps) {
@@ -234,11 +118,10 @@ export function CountryCodeSelector({ value, onChange }: CountryCodeSelectorProp
             const list = transformData(data);
             setCountries(list);
             sessionStorage.setItem('country_codes_v1', JSON.stringify(list));
-            console.log('✅ Loaded countries from local bundle');
             return;
           }
         } catch (err) {
-          console.warn('Local bundle fetch failed:', err);
+          // local bundle fetch failed; continue fallback
         }
 
         // Secondary: try direct fetch from country.io (may be blocked by CORS)
@@ -249,11 +132,10 @@ export function CountryCodeSelector({ value, onChange }: CountryCodeSelectorProp
             const list = transformData(data);
             setCountries(list);
             sessionStorage.setItem('country_codes_v1', JSON.stringify(list));
-            console.log('✅ Loaded countries from country.io');
             return;
           }
         } catch (err) {
-          console.warn('Direct fetch from country.io failed:', err);
+          // direct fetch failed; continue fallback
         }
 
         // Tertiary: try AllOrigins proxy (less reliable)
@@ -265,15 +147,14 @@ export function CountryCodeSelector({ value, onChange }: CountryCodeSelectorProp
             const list2 = transformData(data2);
             setCountries(list2);
             sessionStorage.setItem('country_codes_v1', JSON.stringify(list2));
-            console.log('✅ Loaded countries from proxy');
             return;
           }
         } catch (err) {
-          console.warn('Proxy fetch failed:', err);
+          // proxy fetch failed; continue fallback
         }
 
         // Fallback: use embedded list
-        console.warn('⚠️ Using fallback country list');
+        // Using fallback country list
         setCountries(FALLBACK);
         setError('Could not load full country list; using limited fallback.');
       } catch (err) {
