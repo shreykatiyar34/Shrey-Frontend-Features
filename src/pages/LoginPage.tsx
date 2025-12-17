@@ -51,8 +51,7 @@ export function LoginPage() {
     setLoading(true);
     setError('');
 
-    try {
-      console.log('Sending OTP with identifier:', identifier, 'Mode:', mode);
+      try {
       await authService.sendOtp({
         identifier,
         provider: 'auto',
