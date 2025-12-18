@@ -93,7 +93,7 @@ export function LoginPage() {
       if (response.is_first_time_user) {
         navigate('/onboarding');
       } else {
-        navigate('/home');
+        navigate('/dashboard');
       }
     } catch (err: any) {
       console.error('Verify OTP error:', err);
