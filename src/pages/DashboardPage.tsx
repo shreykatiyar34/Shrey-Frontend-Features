@@ -179,7 +179,7 @@ export function DashboardPage() {
                 <button
                   className="dashboard__primary-btn"
                   type="button"
-                  onClick={() => navigate('/home')}
+                  onClick={() => navigate('/dashboard')}
                 >
                   View Report card
                 </button>

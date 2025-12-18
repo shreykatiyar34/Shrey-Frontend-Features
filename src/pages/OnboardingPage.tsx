@@ -44,7 +44,7 @@ export function OnboardingPage() {
       await authService.addUserInfo(formData);
       // Refresh auth state to get updated user info
       await checkAuth();
-      navigate('/home');
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Onboarding error:', err);
       setError(err.response?.data?.message || 'Failed to save user information. Please try again.');
