@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 
 interface TestConfig {
   chapter: string;
@@ -10,7 +9,6 @@ interface TestConfig {
 export function TestInstructionsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme } = useTheme();
   
   // Get test config from navigation state or use defaults
   const testConfig: TestConfig = location.state?.testConfig || {

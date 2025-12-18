@@ -19,7 +19,7 @@ interface TestResult {
 
 export function TestHistoryPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   // Mock data - replace with actual API call
@@ -65,11 +65,6 @@ export function TestHistoryPage() {
     averageScore: 76,
     bestScore: 83,
     inProgress: 1,
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
   };
 
   const handleResumeTest = (testId: string) => {
