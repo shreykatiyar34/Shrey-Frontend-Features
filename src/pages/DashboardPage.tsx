@@ -1,17 +1,147 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import authService from '../services/authService';
+import contentService from '../services/contentService';
+import type { Subject } from '../services/contentService';
+import type { UserInfo } from '../services/authService';
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const [userProfile, setUserProfile] = useState<UserInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [subjectsError, setSubjectsError] = useState<string | null>(null);
 
-  const displayName = user?.name || 'Ayush Sharma';
-  const studentClass = user?.class_name || 'Class 10';
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Step 1: Check first time user to get student_id
+        const firstTimeCheck = await authService.checkFirstTimeUser();
+        
+        if (!firstTimeCheck.student_id) {
+          throw new Error('Student ID not found');
+        }
+
+        // Step 2: Get user profile using student_id
+        const profileResponse = await authService.getUserById(firstTimeCheck.student_id);
+        
+        // Debug: Log the response to see the structure
+        console.log('Profile Response:', profileResponse);
+        
+        // Extract profile data - it might be nested in profile field or directly in response
+        // Check if profile exists and is not empty
+        let profile = profileResponse.profile;
+        
+        // If profile is an empty object or doesn't exist, try using the response directly
+        if (!profile || (typeof profile === 'object' && Object.keys(profile).length === 0)) {
+          profile = profileResponse;
+        }
+        
+        // Debug: Log the extracted profile
+        console.log('Extracted Profile:', profile);
+        console.log('Profile keys:', profile ? Object.keys(profile) : 'No profile');
+        
+        // Transform to UserInfo format if needed
+        // Handle different possible field names and structures
+        const userData: UserInfo = {
+          student_id: profileResponse.student_id || firstTimeCheck.student_id,
+          name: profile?.name || profile?.full_name || profile?.user_name || profile?.username || '',
+          school: profile?.school || profile?.school_name || '',
+          class_name: profile?.class_name || profile?.class || profile?.grade || '',
+          age: profile?.age || '',
+          location: profile?.location || profile?.city || '',
+          contact: profile?.contact || profile?.phone || profile?.phone_number || '',
+          email: profile?.email || '',
+          phone: profile?.phone || profile?.phone_number || '',
+          is_first_time_user: firstTimeCheck.is_first_time_user,
+          ...(profile || {}),
+        };
+
+        // Debug: Log the final user data
+        console.log('Final User Data:', userData);
+
+        setUserProfile(userData);
+      } catch (err: any) {
+        console.error('Failed to fetch user profile:', err);
+        setError(err.response?.data?.detail || err.message || 'Failed to load user profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // Fetch subjects based on board, medium, and class
+  const fetchSubjects = useCallback(async (boardName: string, mediumName: string, className: string) => {
+    try {
+      setLoadingSubjects(true);
+      setSubjectsError(null);
+      const subjectsData = await contentService.getSubjects(boardName, mediumName, className);
+      setSubjects(subjectsData);
+    } catch (err: any) {
+      console.error('Failed to fetch subjects:', err);
+      setSubjectsError(err.message || 'Failed to load subjects');
+      setSubjects([]);
+    } finally {
+      setLoadingSubjects(false);
+    }
+  }, []);
+
+  // Fetch subjects when user profile is loaded and has board, medium, and class
+  useEffect(() => {
+    if (userProfile?.board && userProfile?.medium && userProfile?.class_name) {
+      fetchSubjects(userProfile.board, userProfile.medium, userProfile.class_name);
+    } else {
+      // Clear subjects if profile is incomplete
+      setSubjects([]);
+      setSubjectsError(null);
+    }
+  }, [userProfile?.board, userProfile?.medium, userProfile?.class_name, fetchSubjects]);
+
+  const displayName = userProfile?.name || 'User';
+  const studentClass = userProfile?.class_name || '';
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  if (loading) {
+    return (
+      <div className="page page--dashboard">
+        <div className="page__backdrop" />
+        <div className="page__content page__content--wide">
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+            <div>Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page page--dashboard">
+        <div className="page__backdrop" />
+        <div className="page__content page__content--wide">
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column' }}>
+            <div className="error-message" style={{ marginBottom: '1rem' }}>{error}</div>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page page--dashboard">
@@ -42,7 +172,11 @@ export function DashboardPage() {
 
             <div className="dashboard__section-label">Chapter Focus</div>
             <nav className="dashboard__nav dashboard__nav--secondary">
-              <button className="dashboard__nav-item" type="button">
+              <button 
+                className="dashboard__nav-item" 
+                type="button"
+                onClick={() => navigate('/test')}
+              >
                 Test
               </button>
               <button className="dashboard__nav-item" type="button">
@@ -56,11 +190,11 @@ export function DashboardPage() {
             <div className="dashboard__sidebar-footer">
               <div className="dashboard__user-chip">
                 <div className="dashboard__user-avatar">
-                  {(user?.name?.charAt(0) || 'A').toUpperCase()}
+                  {(userProfile?.name?.charAt(0) || 'U').toUpperCase()}
                 </div>
                 <div className="dashboard__user-meta">
                   <div className="dashboard__user-name">{displayName}</div>
-                  <div className="dashboard__user-class">{studentClass}</div>
+                  <div className="dashboard__user-class">{studentClass || 'Not set'}</div>
                 </div>
               </div>
               <button className="dashboard__logout-btn" type="button" onClick={handleLogout}>
@@ -80,93 +214,64 @@ export function DashboardPage() {
                 <button className="dashboard__level-pill" type="button">
                   Level 1 Explorer
                 </button>
-                <button className="dashboard__icon-button" type="button" aria-label="Toggle theme">
-                  ☀️
+                <button 
+                  className="dashboard__icon-button" 
+                  type="button" 
+                  aria-label="Toggle theme"
+                  onClick={toggleTheme}
+                  title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {theme === 'dark' ? '☀️' : '🌙'}
                 </button>
               </div>
             </header>
 
             {/* Subjects row */}
             <section className="dashboard__subjects">
-              <article className="subject-card subject-card--active">
-                <div className="subject-card__header">
-                  <div>
-                    <h3 className="subject-card__title">Mathematics</h3>
-                    <p className="subject-card__topic">Active: Surface Area and Volume</p>
-                  </div>
-                  <span className="subject-card__status">Active</span>
+              {loadingSubjects ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                  Loading subjects...
                 </div>
-                <div className="subject-card__progress">
-                  <div className="subject-card__progress-bar">
-                    <div className="subject-card__progress-fill" style={{ width: '62%' }} />
-                  </div>
-                  <span className="subject-card__progress-value">62%</span>
+              ) : subjectsError ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#d32f2f' }}>
+                  {subjectsError}
                 </div>
-              </article>
-
-              <article className="subject-card">
-                <div className="subject-card__header">
-                  <div>
-                    <h3 className="subject-card__title">Science</h3>
-                    <p className="subject-card__topic">Active: Electricity</p>
-                  </div>
-                  <span className="subject-card__status">Active</span>
+              ) : subjects.length === 0 ? (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                  {userProfile?.board && userProfile?.medium && userProfile?.class_name
+                    ? 'No subjects available for your board, medium, and class combination.'
+                    : 'Please complete your profile (board, medium, and class) to see subjects.'}
                 </div>
-                <div className="subject-card__progress">
-                  <div className="subject-card__progress-bar">
-                    <div className="subject-card__progress-fill" style={{ width: '48%' }} />
-                  </div>
-                  <span className="subject-card__progress-value">48%</span>
-                </div>
-              </article>
-
-              <article className="subject-card">
-                <div className="subject-card__header">
-                  <div>
-                    <h3 className="subject-card__title">Social Science</h3>
-                    <p className="subject-card__topic">Active</p>
-                  </div>
-                  <span className="subject-card__status">Active</span>
-                </div>
-                <div className="subject-card__progress">
-                  <div className="subject-card__progress-bar">
-                    <div className="subject-card__progress-fill" style={{ width: '40%' }} />
-                  </div>
-                  <span className="subject-card__progress-value">40%</span>
-                </div>
-              </article>
-
-              <article className="subject-card">
-                <div className="subject-card__header">
-                  <div>
-                    <h3 className="subject-card__title">Hindi</h3>
-                    <p className="subject-card__topic">Active: Electricity</p>
-                  </div>
-                  <span className="subject-card__status">Active</span>
-                </div>
-                <div className="subject-card__progress">
-                  <div className="subject-card__progress-bar">
-                    <div className="subject-card__progress-fill" style={{ width: '32%' }} />
-                  </div>
-                  <span className="subject-card__progress-value">32%</span>
-                </div>
-              </article>
-
-              <article className="subject-card">
-                <div className="subject-card__header">
-                  <div>
-                    <h3 className="subject-card__title">English</h3>
-                    <p className="subject-card__topic">Active: Electricity</p>
-                  </div>
-                  <span className="subject-card__status">Active</span>
-                </div>
-                <div className="subject-card__progress">
-                  <div className="subject-card__progress-bar">
-                    <div className="subject-card__progress-fill" style={{ width: '20%' }} />
-                  </div>
-                  <span className="subject-card__progress-value">20%</span>
-                </div>
-              </article>
+              ) : (
+                subjects.map((subject, index) => (
+                  <article
+                    key={subject.id || index}
+                    className={`subject-card ${index === 0 ? 'subject-card--active' : ''}`}
+                  >
+                    <div className="subject-card__header">
+                      <div>
+                        <h3 className="subject-card__title">{subject.name}</h3>
+                        <p className="subject-card__topic">
+                          {subject.code ? `Code: ${subject.code}` : 'Active'}
+                        </p>
+                      </div>
+                      <span className="subject-card__status">Active</span>
+                    </div>
+                    <div className="subject-card__progress">
+                      <div className="subject-card__progress-bar">
+                        {/* Placeholder progress - can be replaced with actual progress data when available */}
+                        <div
+                          className="subject-card__progress-fill"
+                          style={{ width: `${Math.floor(Math.random() * 50 + 20)}%` }}
+                        />
+                      </div>
+                      <span className="subject-card__progress-value">
+                        {Math.floor(Math.random() * 50 + 20)}%
+                      </span>
+                    </div>
+                  </article>
+                ))
+              )}
             </section>
 
             {/* Mastery section */}
