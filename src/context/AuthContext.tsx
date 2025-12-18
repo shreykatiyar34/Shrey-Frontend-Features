@@ -30,7 +30,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await authService.verifyToken();
         
         // Get user data
-        const userData = await authService.getUserById(studentId);
+        const profileResponse = await authService.getUserById(studentId);
+        
+        // Extract profile data from response
+        const profile = profileResponse.profile || {};
+        
+        // Transform to UserInfo format
+        const userData: UserInfo = {
+          student_id: profileResponse.student_id || studentId,
+          name: profile.name || '',
+          school: profile.school || '',
+          class_name: profile.class_name || profile.class || '',
+          age: profile.age || '',
+          location: profile.location || '',
+          contact: profile.contact || '',
+          email: profile.email,
+          phone: profile.phone,
+          is_first_time_user: profile.is_first_time_user || false,
+          ...profile,
+        };
+        
         setUser(userData);
         setIsAuthenticated(true);
       } else {
