@@ -31,10 +31,13 @@ export interface VerifyTokenResponse {
 export interface AddUserInfoRequest {
   name: string;
   school: string;
+  board?: string;
   class_name: string;
+  medium?: string;
   age: string;
   location: string;
   contact: string;
+  guardian_contact?: string;
 }
 
 export interface AddUserInfoResponse {
@@ -58,8 +61,18 @@ export interface UserInfo {
 }
 
 export interface CheckFirstTimeUserResponse {
+  success: boolean;
   is_first_time_user: boolean;
+  user_id?: string;
   student_id: string;
+  profile?: any;
+}
+
+export interface UserProfileResponse {
+  success: boolean;
+  message: string;
+  student_id: string;
+  profile: UserInfo | any;
 }
 
 class AuthService {
@@ -115,17 +128,28 @@ class AuthService {
 
   /**
    * Get user by student ID
+   * GET /api/v1/auth/user/{student_id}
    */
-  async getUserById(studentId: string): Promise<UserInfo> {
+  async getUserById(studentId: string): Promise<UserProfileResponse> {
     const response = await apiClient.get(`/auth/user/${studentId}`);
     return response.data;
   }
 
   /**
    * Check if user is first time user
+   * GET /api/v1/auth/check-first-time-user
    */
   async checkFirstTimeUser(): Promise<CheckFirstTimeUserResponse> {
     const response = await apiClient.get('/auth/check-first-time-user');
+    return response.data;
+  }
+
+  /**
+   * Get user profile by student ID
+   * GET /api/v1/auth/addUserInfo/{student_id}
+   */
+  async getUserProfile(studentId: string): Promise<UserProfileResponse> {
+    const response = await apiClient.get(`/auth/addUserInfo/${studentId}`);
     return response.data;
   }
 
