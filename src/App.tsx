@@ -2,8 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { OnboardingPage } from './pages/OnboardingPage';
-import { HomePage } from './pages/HomePage';
-import DashboardPage from './pages/DashboardPage';
+import { DashboardPage } from './pages/DashboardPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './App.css';
 
@@ -21,14 +20,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <OnboardingPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <HomePage />
               </ProtectedRoute>
             }
           />
