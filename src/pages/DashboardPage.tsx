@@ -316,7 +316,7 @@ export function DashboardPage() {
             </section>
           </main>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
