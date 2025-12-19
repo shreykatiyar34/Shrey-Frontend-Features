@@ -142,6 +142,19 @@
   align-items: flex-end;
 }
 
+.phone-field-wrapper .field {
+  flex: 1;
+}
+
+.phone-field-wrapper .field__input {
+  width: 100%;
+}
+
+.phone-field-wrapper .field__label {
+  width: 100%;
+  text-align: center;
+}
+
 .country-selector {
   position: relative;
 }
